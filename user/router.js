@@ -6,34 +6,34 @@ const router = new Router()
 
 router.post('/user', (req, res, next) => {
   const user = {
-    user_name: req.body.userName,
+    username: req.body.username,
     password: bcrypt.hashSync(req.body.password, 10)
   }
   User.create(user)
-    .then(event => res.send(event))
+    .then(user => res.send(user))
 })
 
 router.get('/user', (req, res, next) => {
-  Event.findAll()
+  User.findAll()
     .then(users => res.send(users))
     .catch(next)
 })
 
 router.get('/user/:id', (req, res, next) => {
-  Event.findByPk(req.params.id)
+  User.findByPk(req.params.id)
     .then(user => res.send(user))
     .catch(next)
 })
 
 router.put('/user/:id', (req, res, next) => {
-  Event.findByPk(req.params.id)
+  User.findByPk(req.params.id)
     .then(user => user.update(req.body))
     .then(user => res.send(user))
     .catch(next)
 })
 
 router.delete('/user/:id', (req, res, next) => {
-  Event.destroy({ where: { id: req.params.id } })
+  User.destroy({ where: { id: req.params.id } })
     .then(number => res.send({ number }))
     .catch(next)
 })
