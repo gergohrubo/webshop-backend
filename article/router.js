@@ -1,10 +1,15 @@
 const { Router } = require('express')
 const Article = require('./model')
+const { toJWT, toData } = require('../auth/jwt')
 
 const router = new Router()
 
 router.post('/article', (req, res, next) => {
-  Article.create(req.body)
+  const data = { ...req.body }
+  const jwtToBeConverted = data['user_id']
+  const convertedJWT = toData(jwtToBeConverted)
+  data['user_id'] = convertedJWT['userId'].toString()
+  Article.create(data)
     .then(article => res.send(article))
 })
 
