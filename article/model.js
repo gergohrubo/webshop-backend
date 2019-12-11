@@ -21,6 +21,10 @@ const Article = sequelize.define('article', {
   price: {
     type: Sequelize.INTEGER,
     allowNull: false
+  },
+  url: {
+    type: Sequelize.STRING,
+    allowNull: false
   }
 }, {
   timestamps: false,
