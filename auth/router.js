@@ -11,7 +11,6 @@ router.post('/login', (req, res, next) => {
       message: 'Please supply a valid email and password'
     })
   } else {
-    // 1. find user based on email address
     User
       .findOne({
         where: {
@@ -24,11 +23,7 @@ router.post('/login', (req, res, next) => {
             message: 'User with that user name does not exist'
           })
         }
-
-        // 2. use bcrypt.compareSync to check the password against the stored hash
         else if (bcrypt.compareSync(req.body.password, entity.password)) {
-
-          // 3. if the password is correct, return a JWT with the userId of the user (user.id)
           res.send({
             jwt: toJWT({ userId: entity.id }),
             username: entity.username
