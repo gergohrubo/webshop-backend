@@ -1,14 +1,12 @@
 const { Router } = require('express')
 const Article = require('./model')
-const { toJWT, toData } = require('../auth/jwt')
+const authMiddleware = require('../auth/middleware')
 
 const router = new Router()
 
-router.post('/article', (req, res, next) => {
+router.post('/article', authMiddleware, (req, res, next) => {
   const data = { ...req.body }
-  const jwtToBeConverted = data['user_id']
-  const convertedJWT = toData(jwtToBeConverted)
-  data['user_id'] = convertedJWT['userId'].toString()
+  data['user_id'] = req.user.id
   Article.create(data)
     .then(article => res.send(article))
 })
@@ -25,15 +23,20 @@ router.get('/article/:id', (req, res, next) => {
     .catch(next)
 })
 
-router.put('/article/:id', (req, res, next) => {
+router.put('/article/:id', authMiddleware, (req, res, next) => {
   Article.findByPk(req.params.id)
-    .then(article => article.update(req.body))
+    .then(article => {
+      if (article.user_id === req.user.id) {
+        return article.update(req.body)
+      }
+      return res.status(400).send('This article is not yours to edit')
+    })
     .then(article => res.send(article))
     .catch(next)
 })
 
 router.delete('/article/:id', (req, res, next) => {
-  Article.destroy({ where: { id: req.params.id } })
+  Article.destroy({ where: { id: req.params.id, user_id: req.user.id } })
     .then(number => res.send({ number }))
     .catch(next)
 })
