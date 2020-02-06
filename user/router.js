@@ -25,9 +25,14 @@ router.get('/user/:id', (req, res, next) => {
     .catch(next)
 })
 
-router.put('/user/:id', (req, res, next) => {
+router.put('/user/:id', authMiddleware, (req, res, next) => {
   User.findByPk(req.params.id)
-    .then(user => user.update(req.body))
+    .then(user => {
+      if (user.id === req.user.id) {
+        return user.update(req.body)
+      }
+      return res.status(400).send('You are not authorized to update this')
+    })
     .then(user => res.send(user))
     .catch(next)
 })
