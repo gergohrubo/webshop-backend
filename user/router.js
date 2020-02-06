@@ -1,6 +1,7 @@
 const { Router } = require('express')
 const User = require('./model')
 const bcrypt = require('bcrypt')
+const authMiddleware = require('../auth/middleware')
 
 const router = new Router()
 
@@ -37,9 +38,12 @@ router.put('/user/:id', authMiddleware, (req, res, next) => {
     .catch(next)
 })
 
-router.delete('/user/:id', (req, res, next) => {
-  User.destroy({ where: { id: req.params.id } })
-    .then(number => res.send({ number }))
+router.delete('/user/:id', authMiddleware, (req, res, next) => {
+  if (req.params.id !== req.user.id) {
+    res.status(401).send('Please append valid credentials')
+  }
+  User.destroy({ where: { id: req.user.id } })
+    .then(user => res.send({ user }))
     .catch(next)
 })
 

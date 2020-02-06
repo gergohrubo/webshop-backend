@@ -35,9 +35,9 @@ router.put('/article/:id', authMiddleware, (req, res, next) => {
     .catch(next)
 })
 
-router.delete('/article/:id', (req, res, next) => {
+router.delete('/article/:id', authMiddleware, (req, res, next) => {
   Article.destroy({ where: { id: req.params.id, user_id: req.user.id } })
-    .then(number => res.send({ number }))
+    .then(article => res.send({ article }))
     .catch(next)
 })
 
